@@ -23,8 +23,8 @@ Rokey_turtlebot/
 ---
 
 ### 🔀 2. Branch & Pull Request
-- 작업은 **branch를 생성**하여 진행해 주세요.
-- 작업 완료 후 GitHub 사이트에서 **Pull Request(PR)** 를 생성해 주세요.
+- 작업은 본인의 폴더 안에서 진행해주세요.
+- **개인 branch**에 push 했을시, GitHub 사이트에서 **Pull Request(PR)** 를 생성해 주세요.
 - PR이 승인되어야 `main` 브랜치에 반영됩니다.
 
 ```bash
