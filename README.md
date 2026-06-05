@@ -9,15 +9,14 @@
 각 파트별로 **별도 폴더**를 생성하여 코드를 정리해 주세요.
 
 ```
-Rokey_turtlebot/
-├── T1/
-│   ├── web/               # 웹 인터페이스
-│   ├── LLM/               # 대규모 언어 모델
-│   └── STT/               # 음성 인식 (Speech-to-Text)
-└── T2/
-    ├── navigation/        # 경로 계획 및 주행
-    ├── localization/      # 위치 추정
-    └── ...
+본인 워크스페이스/
+    ├── src
+        ├── web/               # 웹 인터페이스
+        ├── LLM/               # 대규모 언어 모델
+        └── STT/               # 음성 인식 (Speech-to-Text)
+        ├── navigation/        # 경로 계획 및 주행
+        ├── localization/      # 위치 추정
+        └── ...
 ```
 
 ---
