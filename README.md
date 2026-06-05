@@ -14,6 +14,8 @@ git clone https://github.com/junsu122/Rokey_turtlebot.git src
 각 파트별로 **별도 폴더**를 생성하여 코드를 정리해 주세요.
 
 ```
+### 예시 구조 ###
+
 본인 워크스페이스/
     ├── src
         ├── web/               # 웹 인터페이스
