@@ -1,7 +1,7 @@
 import { RobotFace, ScreenFrame } from '@/components';
 import { getFloor, useStrings } from '@/config';
-import type { AppStrings } from '@/core/i18n';
-import type { NavigationSession } from '@/core/domain';
+import { useLanguage, type AppStrings, type Language } from '@/core/i18n';
+import { localizedFacilityName, type NavigationSession } from '@/core/domain';
 import { useKioskState } from '@/core/kiosk';
 import { useGuidance } from './GuidanceProvider';
 import styles from './GuidingScreen.module.css';
@@ -15,13 +15,14 @@ import styles from './GuidingScreen.module.css';
 export function GuidingScreen() {
   const { session } = useKioskState();
   const strings = useStrings();
+  const { language } = useLanguage();
   const { cancelGuidance } = useGuidance();
 
   if (!session) return null;
 
   const arrived = session.progress.phase === 'arrived';
   const caption = arrived ? strings.guiding.arrived : strings.guiding.caption;
-  const subtitle = arrived ? undefined : describe(session, strings);
+  const subtitle = arrived ? undefined : describe(session, strings, language);
   const ratio = Math.min(1, Math.max(0, session.progress.ratio));
 
   return (
@@ -45,7 +46,11 @@ export function GuidingScreen() {
   );
 }
 
-function describe(session: NavigationSession, strings: AppStrings): string {
+function describe(
+  session: NavigationSession,
+  strings: AppStrings,
+  language: Language,
+): string {
   const { plan, progress } = session;
 
   if (plan.kind === 'cross-floor' && plan.transfer) {
@@ -53,8 +58,13 @@ function describe(session: NavigationSession, strings: AppStrings): string {
     if (progress.phase === 'awaiting-handoff') {
       return strings.guiding.handoff(toFloor);
     }
-    return strings.guiding.viaTransfer(plan.transfer.via.name, toFloor);
+    return strings.guiding.viaTransfer(
+      localizedFacilityName(plan.transfer.via, language),
+      toFloor,
+    );
   }
 
-  return strings.guiding.toDestination(plan.destination.name);
+  return strings.guiding.toDestination(
+    localizedFacilityName(plan.destination, language),
+  );
 }

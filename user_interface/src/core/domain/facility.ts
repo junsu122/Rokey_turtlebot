@@ -1,3 +1,5 @@
+import type { Language } from '@/core/i18n';
+
 /**
  * A facility a user can be guided to (restroom, office, exit, transfer point...).
  * Pure domain type — no UI, no framework.
@@ -40,8 +42,10 @@ export interface FacilityFootprint {
 
 export interface Facility {
   id: string;
-  /** Display name in Korean, e.g. "화장실". */
+  /** Display name in Korean (default / fallback), e.g. "화장실". */
   name: string;
+  /** Localized display names (en/ja/zh). Falls back to `name` (ko). */
+  i18n?: Partial<Record<Language, string>>;
   category: FacilityCategory;
   /** Which floor this facility physically lives on. */
   floorId: string;
@@ -91,4 +95,12 @@ export function isTransferFacility(facility: Facility): boolean {
 export function isSelectableFacility(facility: Facility): boolean {
   // Navigable only if it maps to a server POI id and isn't explicitly hidden.
   return facility.poiId != null && facility.selectable !== false;
+}
+
+/** Display name for a facility in the given language (falls back to Korean `name`). */
+export function localizedFacilityName(
+  facility: Facility,
+  language: Language,
+): string {
+  return facility.i18n?.[language] ?? facility.name;
 }

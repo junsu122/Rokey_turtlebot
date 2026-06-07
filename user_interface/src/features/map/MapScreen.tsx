@@ -13,7 +13,12 @@ import {
   kioskConfig,
   useStrings,
 } from '@/config';
-import { isSelectableFacility, type Facility } from '@/core/domain';
+import {
+  isSelectableFacility,
+  localizedFacilityName,
+  type Facility,
+} from '@/core/domain';
+import { useLanguage } from '@/core/i18n';
 import { useKioskDispatch } from '@/core/kiosk';
 import { cx } from '@/core/utils';
 import { useGuidance } from '@/features/guiding/GuidanceProvider';
@@ -28,6 +33,7 @@ import styles from './MapScreen.module.css';
 export function MapScreen() {
   const dispatch = useKioskDispatch();
   const strings = useStrings();
+  const { language } = useLanguage();
   const { guideTo } = useGuidance();
   const [floorId, setFloorId] = useState(kioskConfig.currentFloorId);
   const [selectedId, setSelectedId] = useState<string>();
@@ -46,45 +52,50 @@ export function MapScreen() {
   return (
     <ScreenFrame tone="light">
       <header className={styles.header}>
-        <BigButton
-          tone="neutral"
-          size="compact"
-          icon="←"
-          label={strings.map.back}
-          onClick={() => dispatch({ type: 'GO_HOME' })}
-        />
-        <div className={styles.titleBlock}>
-          <h1 className={styles.title}>{strings.map.title}</h1>
-          <p className={styles.subtitle}>{strings.map.subtitle}</p>
+        <div className={styles.topbar}>
+          <div
+            className={styles.floors}
+            role="tablist"
+            aria-label={strings.map.floorPickerLabel}
+          >
+            {floors.map((floorOption) => (
+              <button
+                key={floorOption.id}
+                type="button"
+                role="tab"
+                aria-selected={floorOption.id === floorId}
+                className={cx(
+                  styles.floorTab,
+                  floorOption.id === floorId && styles.floorTabActive,
+                )}
+                onClick={() => {
+                  setFloorId(floorOption.id);
+                  setSelectedId(undefined);
+                }}
+              >
+                {floorOption.shortName}
+                {floorOption.id === kioskConfig.currentFloorId && (
+                  <span className={styles.hereTag}>{strings.map.here}</span>
+                )}
+              </button>
+            ))}
+          </div>
+          <LanguageSwitcher />
         </div>
-        <div
-          className={styles.floors}
-          role="tablist"
-          aria-label={strings.map.floorPickerLabel}
-        >
-          {floors.map((floorOption) => (
-            <button
-              key={floorOption.id}
-              type="button"
-              role="tab"
-              aria-selected={floorOption.id === floorId}
-              className={cx(
-                styles.floorTab,
-                floorOption.id === floorId && styles.floorTabActive,
-              )}
-              onClick={() => {
-                setFloorId(floorOption.id);
-                setSelectedId(undefined);
-              }}
-            >
-              {floorOption.shortName}
-              {floorOption.id === kioskConfig.currentFloorId && (
-                <span className={styles.hereTag}>{strings.map.here}</span>
-              )}
-            </button>
-          ))}
+
+        <div className={styles.titleRow}>
+          <BigButton
+            tone="neutral"
+            size="compact"
+            icon="←"
+            label={strings.map.back}
+            onClick={() => dispatch({ type: 'GO_HOME' })}
+          />
+          <div className={styles.titleBlock}>
+            <h1 className={styles.title}>{strings.map.title}</h1>
+            <p className={styles.subtitle}>{strings.map.subtitle}</p>
+          </div>
         </div>
-        <LanguageSwitcher />
       </header>
 
       <div className={styles.content}>
@@ -94,6 +105,7 @@ export function MapScreen() {
             facilities={list}
             onSelect={handleSelect}
             selectedId={selectedId}
+            language={language}
           />
         </div>
 
@@ -104,7 +116,7 @@ export function MapScreen() {
                 tone="neutral"
                 size="compact"
                 icon={<FacilityIcon category={facility.category} />}
-                label={facility.name}
+                label={localizedFacilityName(facility, language)}
                 onClick={() => handleSelect(facility)}
                 className={styles.listItem}
               />

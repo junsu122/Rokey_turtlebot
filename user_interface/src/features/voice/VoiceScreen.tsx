@@ -6,6 +6,8 @@ import {
   StaffCallButton,
 } from '@/components';
 import { useStrings } from '@/config';
+import { localizedFacilityName } from '@/core/domain';
+import { useLanguage } from '@/core/i18n';
 import { useKioskDispatch } from '@/core/kiosk';
 import { cx } from '@/core/utils';
 import { useGuidance } from '@/features/guiding/GuidanceProvider';
@@ -20,11 +22,15 @@ import styles from './VoiceScreen.module.css';
 export function VoiceScreen() {
   const dispatch = useKioskDispatch();
   const strings = useStrings();
+  const { language } = useLanguage();
   const { guideTo } = useGuidance();
   const { state, transcript, understanding, startListening, stopListening } =
     useVoiceFlow();
 
   const candidate = understanding?.facility ?? null;
+  const candidateName = candidate
+    ? localizedFacilityName(candidate, language)
+    : '';
   const showTranscript =
     transcript !== '' || state === 'listening' || state === 'thinking';
 
@@ -87,10 +93,10 @@ export function VoiceScreen() {
                 category={candidate.category}
                 className={styles.candidateIcon}
               />
-              <span className={styles.candidateName}>{candidate.name}</span>
+              <span className={styles.candidateName}>{candidateName}</span>
             </div>
             <p className={styles.question}>
-              {strings.voice.confirmQuestion(candidate.name)}
+              {strings.voice.confirmQuestion(candidateName)}
             </p>
             <div className={styles.actions}>
               <BigButton

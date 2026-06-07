@@ -10,6 +10,7 @@ export {
   TRANSFER_CATEGORIES,
   isTransferFacility,
   isSelectableFacility,
+  localizedFacilityName,
 } from './facility';
 
 export type {

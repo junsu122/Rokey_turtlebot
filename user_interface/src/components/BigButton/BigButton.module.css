@@ -38,6 +38,7 @@
 
 .label {
   line-height: 1.1;
+  white-space: nowrap; /* keep short button labels (뒤로 / Back / 戻る) on one line */
 }
 
 .sublabel {

@@ -1,7 +1,8 @@
 import type { KeyboardEvent, ReactNode } from 'react';
 import { BLUEPRINT } from '@/config';
-import { isSelectableFacility } from '@/core/domain';
+import { isSelectableFacility, localizedFacilityName } from '@/core/domain';
 import type { BlueprintDecoration, Facility, Floor } from '@/core/domain';
+import type { Language } from '@/core/i18n';
 import { cx } from '@/core/utils';
 import styles from './Blueprint.module.css';
 
@@ -10,6 +11,7 @@ interface BlueprintProps {
   facilities: Facility[];
   onSelect: (facility: Facility) => void;
   selectedId?: string;
+  language: Language;
 }
 
 /**
@@ -22,6 +24,7 @@ export function Blueprint({
   facilities,
   onSelect,
   selectedId,
+  language,
 }: BlueprintProps) {
   const { outline } = floor;
 
@@ -74,6 +77,7 @@ export function Blueprint({
           facility={facility}
           selected={facility.id === selectedId}
           onSelect={onSelect}
+          language={language}
         />
       ))}
     </svg>
@@ -84,12 +88,15 @@ function Fixture({
   facility,
   selected,
   onSelect,
+  language,
 }: {
   facility: Facility;
   selected: boolean;
   onSelect: (facility: Facility) => void;
+  language: Language;
 }) {
   const fp = facility.footprint;
+  const label = localizedFacilityName(facility, language);
   // Display-only fixtures (e.g. benches) are drawn but not navigable: no button
   // role, tap target, keyboard handler, or selection ring.
   const interactive = isSelectableFacility(facility);
@@ -109,7 +116,7 @@ function Fixture({
         className={interactive ? styles.fixture : styles.fixtureStatic}
         role={interactive ? 'button' : undefined}
         tabIndex={interactive ? 0 : undefined}
-        aria-label={facility.name}
+        aria-label={label}
         aria-disabled={interactive ? undefined : true}
         onClick={interactive ? () => onSelect(facility) : undefined}
         onKeyDown={interactive ? onKeyDown : undefined}
@@ -122,16 +129,16 @@ function Fixture({
           r="5"
         />
         <text className={styles.fxLabel} x={x} y={y + 10} textAnchor="middle">
-          {facility.name}
+          {label}
         </text>
       </g>
     );
   }
 
-  // platform/restroom render their own text inside; gate labels sit above
-  // (the elevator/escalator are right below them).
-  const labelInside =
-    facility.category === 'platform' || facility.category === 'restroom';
+  // platform renders its code inside; gate labels sit above (elevator/escalator
+  // are right below them). Everything else (incl. restroom) labels below so
+  // longer translations don't overflow the fixture.
+  const labelInside = facility.category === 'platform';
   const labelAbove = facility.category === 'gate';
   const labelX = fp.x + fp.w / 2;
   const labelY = labelAbove ? fp.y - 2.4 : fp.y + fp.h + 4.4;
@@ -178,7 +185,7 @@ function Fixture({
 
       {!labelInside && (
         <text className={styles.fxLabel} x={labelX} y={labelY} textAnchor="middle">
-          {facility.name}
+          {label}
         </text>
       )}
     </g>
@@ -195,13 +202,9 @@ function drawFixture(facility: Facility): ReactNode {
 
   switch (facility.category) {
     case 'restroom':
+      // Name is drawn below the box (see labelInside) so it isn't clipped.
       return (
-        <>
-          <rect className={styles.room} x={x} y={y} width={w} height={h} rx="1.5" />
-          <text className={styles.wcMark} x={cxp} y={cyp} textAnchor="middle">
-            {facility.name}
-          </text>
-        </>
+        <rect className={styles.room} x={x} y={y} width={w} height={h} rx="1.5" />
       );
 
     case 'info':
