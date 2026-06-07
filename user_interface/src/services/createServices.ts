@@ -4,6 +4,7 @@ import { MockSttService, SonioxSttService, type SttService } from './stt';
 import { ClaudeLlmService, MockLlmService, type LlmService } from './llm';
 import { MockNavigationService } from './navigation';
 import { MockFmsService } from './fms';
+import { WebSpeechTtsService } from './tts';
 import type { Services } from './types';
 
 /**
@@ -38,5 +39,8 @@ export function createDefaultServices(): Services {
 
   const fms = new MockFmsService();
 
-  return { ros, stt, llm, navigation, fms };
+  // Browser-native TTS — free/offline, no key, used only in VI mode.
+  const tts = new WebSpeechTtsService();
+
+  return { ros, stt, llm, navigation, fms, tts };
 }

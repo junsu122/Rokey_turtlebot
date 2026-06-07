@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import {
   BigButton,
   FacilityIcon,
@@ -8,10 +9,11 @@ import {
 import { useStrings } from '@/config';
 import { localizedFacilityName } from '@/core/domain';
 import { useLanguage } from '@/core/i18n';
-import { useKioskDispatch } from '@/core/kiosk';
+import { useKioskDispatch, useKioskState } from '@/core/kiosk';
 import { cx } from '@/core/utils';
+import { useSpeak } from '@/services';
 import { useGuidance } from '@/features/guiding/GuidanceProvider';
-import { useVoiceFlow } from './useVoiceFlow';
+import { useVoiceFlow, type VoiceState } from './useVoiceFlow';
 import styles from './VoiceScreen.module.css';
 
 /**
@@ -26,6 +28,11 @@ export function VoiceScreen() {
   const { guideTo } = useGuidance();
   const { state, transcript, understanding, startListening, stopListening } =
     useVoiceFlow();
+  const { mode } = useKioskState();
+  const speak = useSpeak();
+  const vi = mode === 'visually_impaired';
+  const handledRef = useRef<VoiceState | null>(null);
+  const startedRef = useRef(false);
 
   const candidate = understanding?.facility ?? null;
   const candidateName = candidate
@@ -33,6 +40,40 @@ export function VoiceScreen() {
     : '';
   const showTranscript =
     transcript !== '' || state === 'listening' || state === 'thinking';
+
+  // VI mode: greet + auto-start listening once on entry (wake-word flow).
+  useEffect(() => {
+    if (!vi || startedRef.current) return;
+    startedRef.current = true;
+    speak(strings.voice.idleHint, { onEnd: startListening });
+  }, [vi, speak, startListening, strings]);
+
+  // VI mode: hands-free — read each result aloud, then proceed / re-listen.
+  useEffect(() => {
+    if (!vi || handledRef.current === state) return;
+    handledRef.current = state;
+    if (state === 'confirm' && candidate) {
+      const line =
+        understanding?.reply || strings.voice.confirmQuestion(candidateName);
+      speak(line, { onEnd: () => guideTo(candidate) });
+    } else if (state === 'chat') {
+      speak(understanding?.reply ?? '', { onEnd: startListening });
+    } else if (state === 'notfound') {
+      speak(strings.voice.notFound, { onEnd: startListening });
+    } else if (state === 'error') {
+      speak(strings.voice.error, { onEnd: startListening });
+    }
+  }, [
+    vi,
+    state,
+    candidate,
+    candidateName,
+    understanding,
+    speak,
+    guideTo,
+    startListening,
+    strings,
+  ]);
 
   return (
     <ScreenFrame tone="light">

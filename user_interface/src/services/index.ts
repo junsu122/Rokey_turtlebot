@@ -23,6 +23,9 @@ export type {
   NavigationHandlers,
 } from './navigation';
 export type { FmsService } from './fms';
+export type { TtsService, TtsSpeakOptions } from './tts';
+export { WebSpeechTtsService, MockTtsService } from './tts';
+export { useSpeak } from './useSpeak';
 export {
   IF_VERSION,
   buildEscortRequest,

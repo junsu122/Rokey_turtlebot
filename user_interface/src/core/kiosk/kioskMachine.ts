@@ -2,6 +2,7 @@ import type { KioskEvent, KioskState } from './types';
 
 export const initialKioskState: KioskState = {
   screen: 'patrol',
+  mode: 'general',
   staffCallActive: false,
   session: null,
 };
@@ -19,6 +20,12 @@ export function kioskReducer(state: KioskState, event: KioskEvent): KioskState {
   switch (event.type) {
     case 'WAKE':
       return state.screen === 'patrol' ? { ...state, screen: 'home' } : state;
+
+    case 'WAKE_VOICE':
+      // Wake word during patrol → jump straight to voice in VI (TTS) mode.
+      return state.screen === 'patrol'
+        ? { ...state, screen: 'voice', mode: 'visually_impaired' }
+        : state;
 
     case 'OPEN_MAP':
       return state.screen === 'home' ? { ...state, screen: 'map' } : state;

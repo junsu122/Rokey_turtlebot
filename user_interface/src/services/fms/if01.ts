@@ -68,9 +68,15 @@ export interface EscortRequestInput {
   customer: If01Customer;
 }
 
-/** A fresh anonymous customer (the kiosk has no profile picker yet). */
-export function defaultCustomer(): If01Customer {
-  return { customer_id: makeId('C'), profile: 'GENERAL', language: 'ko' };
+/**
+ * A fresh anonymous customer. `profile` is VISUALLY_IMPAIRED in the wake-word
+ * voice (VI) mode, GENERAL otherwise; `language` is the user's UI language.
+ */
+export function defaultCustomer(
+  profile: CustomerProfile = 'GENERAL',
+  language = 'ko',
+): If01Customer {
+  return { customer_id: makeId('C'), profile, language };
 }
 
 /** Build an IF-01 ESCORT request for a confirmed destination. */

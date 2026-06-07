@@ -7,7 +7,10 @@ import { useLanguage, type AppStrings, type Language } from '@/core/i18n';
 const ko: AppStrings = {
   app: { title: 'ALFRED 역사 안내 로봇' },
   lang: { label: '언어' },
-  patrol: { hint: '사용하려면 화면을 터치하세요' },
+  patrol: {
+    hint: '사용하려면 화면을 터치하세요',
+    wakeHint: '또는 "헬로 알프레드"라고 말해보세요 · 음성 안내',
+  },
   home: {
     greeting: (station) => `안녕하세요, ${station} 안내로봇 알프레드예요`,
     question: '무엇을 도와드릴까요?',
@@ -61,7 +64,10 @@ const ko: AppStrings = {
 const en: AppStrings = {
   app: { title: 'ALFRED Station Guide Robot' },
   lang: { label: 'Language' },
-  patrol: { hint: 'Touch the screen to start' },
+  patrol: {
+    hint: 'Touch the screen to start',
+    wakeHint: 'Or say "Hello Alfred" · voice guidance',
+  },
   home: {
     greeting: (station) => `Hi, I'm ALFRED, your guide at ${station}`,
     question: 'How can I help you?',
@@ -115,7 +121,10 @@ const en: AppStrings = {
 const ja: AppStrings = {
   app: { title: 'ALFRED 駅案内ロボット' },
   lang: { label: '言語' },
-  patrol: { hint: 'ご利用の際は画面にタッチしてください' },
+  patrol: {
+    hint: 'ご利用の際は画面にタッチしてください',
+    wakeHint: 'または「ハロー アルフレッド」と話しかけてください · 音声案内',
+  },
   home: {
     greeting: (station) => `こんにちは、${station}のご案内ロボット、アルフレッドです`,
     question: 'ご用件をどうぞ',
@@ -169,7 +178,10 @@ const ja: AppStrings = {
 const zh: AppStrings = {
   app: { title: 'ALFRED 车站向导机器人' },
   lang: { label: '语言' },
-  patrol: { hint: '使用请触摸屏幕' },
+  patrol: {
+    hint: '使用请触摸屏幕',
+    wakeHint: '或说 "Hello Alfred" · 语音向导',
+  },
   home: {
     greeting: (station) => `您好，我是${station}的向导机器人 ALFRED`,
     question: '需要什么帮助？',

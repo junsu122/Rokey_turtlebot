@@ -30,7 +30,7 @@ export function isLanguage(value: unknown): value is Language {
 export interface AppStrings {
   app: { title: string };
   lang: { label: string };
-  patrol: { hint: string };
+  patrol: { hint: string; wakeHint: string };
   home: {
     greeting: (station: string) => string;
     question: string;

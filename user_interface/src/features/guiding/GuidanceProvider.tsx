@@ -8,7 +8,8 @@ import {
 } from 'react';
 import { floorLevel, kioskConfig } from '@/config';
 import type { Facility, NavigationSession } from '@/core/domain';
-import { useKioskDispatch } from '@/core/kiosk';
+import { useLanguage } from '@/core/i18n';
+import { useKioskDispatch, useKioskState } from '@/core/kiosk';
 import {
   buildCancelRequest,
   buildEscortRequest,
@@ -33,6 +34,8 @@ const GuidanceContext = createContext<GuidanceControls | null>(null);
  */
 export function GuidanceProvider({ children }: { children: ReactNode }) {
   const dispatch = useKioskDispatch();
+  const { mode } = useKioskState();
+  const { language } = useLanguage();
   const { navigation, fms } = useServices();
   const handleRef = useRef<NavigationHandle | null>(null);
   const arrivedTimerRef = useRef<number | null>(null);
@@ -66,7 +69,11 @@ export function GuidanceProvider({ children }: { children: ReactNode }) {
             floor: floorLevel(kioskConfig.currentFloorId),
             pose: kioskConfig.originPose,
           },
-          customer: defaultCustomer(),
+          // VI mode (wake word) → profile VISUALLY_IMPAIRED (requirement).
+          customer: defaultCustomer(
+            mode === 'visually_impaired' ? 'VISUALLY_IMPAIRED' : 'GENERAL',
+            language,
+          ),
         });
         requestIdRef.current = request.request_id;
         void fms.sendRequest(request);
@@ -95,7 +102,7 @@ export function GuidanceProvider({ children }: { children: ReactNode }) {
         },
       });
     },
-    [navigation, fms, dispatch, clearArrivedTimer],
+    [navigation, fms, dispatch, clearArrivedTimer, mode, language],
   );
 
   const cancelGuidance = useCallback(() => {
